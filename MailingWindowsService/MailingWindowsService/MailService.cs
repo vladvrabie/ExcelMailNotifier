@@ -28,12 +28,12 @@ namespace MailingWindowsService
 
         protected override void OnStart(string[] args)
         {
-            eventLogger.WriteEntry("In OnStart");
+            eventLogger.LogI("In OnStart.");
         }
 
         protected override void OnStop()
         {
-            eventLogger.WriteEntry("In OnStop");
+            eventLogger.LogI("In OnStop.");
         }
     }
 }

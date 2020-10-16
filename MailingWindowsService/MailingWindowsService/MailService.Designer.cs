@@ -1,4 +1,6 @@
-﻿namespace MailingWindowsService
+﻿using MailingWindowsService.Logging;
+
+namespace MailingWindowsService
 {
     partial class MailService
     {
@@ -28,7 +30,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.eventLogger = new System.Diagnostics.EventLog();
+            this.eventLogger = new ServiceEventLogger();
             ((System.ComponentModel.ISupportInitialize)(this.eventLogger)).BeginInit();
             // 
             // eventLogger
@@ -45,6 +47,6 @@
 
         #endregion
 
-        private System.Diagnostics.EventLog eventLogger;
+        private ServiceEventLogger eventLogger;
     }
 }
