@@ -76,6 +76,7 @@ namespace MailingWindowsService
         private void After24HElapsed(object sender, ElapsedEventArgs args)
         {
             timer.Elapsed -= After24HElapsed;
+            currentDate = DateTime.Today;
             SetupTimerForExcelRead();
         }
 
@@ -137,6 +138,7 @@ namespace MailingWindowsService
             else
             {
                 timer.Elapsed -= SendEmail;
+                currentDate = DateTime.Today;
                 SetupTimerForExcelRead();
             }
         }
