@@ -42,7 +42,7 @@ namespace ReadSendProject.ExcelReader
             }
             catch (Exception ex)
             {
-                logger.LogE($"Error in retrieving excel settings for the app; Message: {ex.Message}");
+                logger?.LogE($"Error in retrieving excel settings for the app; Message: {ex.Message}");
                 return new ExcelReaderParameters();
             }
         }
