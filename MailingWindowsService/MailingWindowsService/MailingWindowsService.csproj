@@ -46,6 +46,7 @@
       <HintPath>..\packages\MimeKit.2.9.2\lib\net47\MimeKit.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
@@ -59,8 +60,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EmailSender\AppConfigReader.cs" />
     <Compile Include="EmailSender\EmailSender.cs" />
     <Compile Include="EmailSender\EmailSenderParameters.cs" />
+    <Compile Include="ExcelReader\AppConfigReader.cs" />
     <Compile Include="ExcelReader\ExcelReader.cs" />
     <Compile Include="ExcelReader\ExcelReaderParameters.cs" />
     <Compile Include="IEnumerableExtensions.cs" />

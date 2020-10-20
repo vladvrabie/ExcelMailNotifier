@@ -30,7 +30,7 @@ namespace MailingWindowsService
         /// </summary>
         private void InitializeComponent()
         {
-            this.eventLogger = new ServiceEventLogger();
+            this.eventLogger = new MailingWindowsService.Logging.ServiceEventLogger();
             ((System.ComponentModel.ISupportInitialize)(this.eventLogger)).BeginInit();
             // 
             // eventLogger
