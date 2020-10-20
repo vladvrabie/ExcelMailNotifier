@@ -141,9 +141,9 @@ namespace MailingWindowsService.ExcelReader
                     int estimatedCapacityUpperLimit = 10;
                     result = new StringMatrix(estimatedCapacityUpperLimit)
                     {
-                        GetHeaderColumnsToEmail()
+                        GetHeaderColumnsToEmail()  // always returns a list with at least 1 element
                     };
-                    result.AddRange(ProcessCells());
+                    result.AddRange(ProcessCells()); // can return empty list
 
                     ReleaseRangesAndSheets();
                 }
