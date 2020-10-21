@@ -1,18 +1,18 @@
-﻿using MailKit.Net.Smtp;
+﻿using MailingWindowsService.Logging;
+using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
-using MailingWindowsService.Logging;
 using System;
 using StringMatrix = System.Collections.Generic.List<System.Collections.Generic.List<string>>;
 
 namespace MailingWindowsService.EmailSender
 {
-    class EmailSender
+    class MailKitEmailSender
     {
         public ILogger logger;
         private readonly EmailSenderParameters emailParams;
 
-        public EmailSender(EmailSenderParameters parameters)
+        public MailKitEmailSender(EmailSenderParameters parameters)
         {
             emailParams = parameters;
         }

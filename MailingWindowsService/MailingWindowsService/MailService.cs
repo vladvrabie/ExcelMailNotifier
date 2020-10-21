@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Linq;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
 using System.Timers;
 using StringMatrix = System.Collections.Generic.List<System.Collections.Generic.List<string>>;
 
@@ -52,6 +46,7 @@ namespace MailingWindowsService
             timer.AutoReset = true;
             timer.Elapsed += GetExcelData;
             timer.Start();
+            eventLogger.LogI("In SetupTimerForExcelRead.");
         }
 
         private void SetupTimerForSendEmail()
@@ -61,6 +56,7 @@ namespace MailingWindowsService
             timer.AutoReset = true;
             timer.Elapsed += SendEmail;
             timer.Start();
+            eventLogger.LogI("In SetupTimerForSendEmail.");
         }
 
         private void SetupTimerToWait24H()
@@ -70,7 +66,7 @@ namespace MailingWindowsService
             timer.AutoReset = false;
             timer.Elapsed += After24HElapsed;
             timer.Start();
-            eventLogger.LogI("No email today.");
+            eventLogger.LogI("In SetupTimerToWait24H.");
         }
 
         private void After24HElapsed(object sender, ElapsedEventArgs args)
@@ -106,7 +102,7 @@ namespace MailingWindowsService
             { 
                 logger = eventLogger 
             }.GetExcelReaderParameters();
-            var excelReader = new ExcelReader.ExcelReader(parameters) 
+            var excelReader = new ExcelReader.NPOIExcelReader(parameters) 
             { 
                 logger = eventLogger 
             };
@@ -149,7 +145,7 @@ namespace MailingWindowsService
             {
                 logger = eventLogger
             }.GetEmailSenderParameters();
-            var emailSender = new EmailSender.EmailSender(parameters)
+            var emailSender = new EmailSender.MailKitEmailSender(parameters)
             {
                 logger = eventLogger
             };
