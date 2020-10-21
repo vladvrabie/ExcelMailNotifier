@@ -1,30 +1,24 @@
-﻿using ReadSendProject.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using Excel = Microsoft.Office.Interop.Excel;
 using StringMatrix = System.Collections.Generic.List<System.Collections.Generic.List<string>>;
 
-namespace ReadSendProject
+namespace ReadSendProject.ExcelReader
 {
-    class ExcelReader
+    class MSInteropExcelReader : AbstractExcelReader
     {
-        public ILogger logger;
-
-        private readonly ExcelReaderParameters excelParams;
-
         private Excel.Application application;
         private Excel.Workbook workbook;
         private readonly List<Excel._Worksheet> sheets;
         private readonly List<Excel.Range> ranges;
 
-        public ExcelReader(ExcelReaderParameters parameters)
+        public MSInteropExcelReader(ExcelReaderParameters parameters)
+            : base(parameters)
         {
-            excelParams = parameters;
-
-            int sheetsNamesCount = excelParams.sheetsNames?.Count ?? 0;
-            int sheetsIndexesCount = excelParams.sheetsIndexes?.Count ?? 0;
+            int sheetsNamesCount = excelParameters.sheetsNames?.Count ?? 0;
+            int sheetsIndexesCount = excelParameters.sheetsIndexes?.Count ?? 0;
             sheets = new List<Excel._Worksheet>(sheetsNamesCount + sheetsIndexesCount);
             ranges = new List<Excel.Range>(sheets.Capacity);
         }
@@ -34,7 +28,7 @@ namespace ReadSendProject
             try
             {
                 application = new Excel.Application();
-                workbook = application.Workbooks.Open(excelParams.path, ReadOnly: true);
+                workbook = application.Workbooks.Open(excelParameters.path, ReadOnly: true);
                 return true;
             }
             catch (COMException ex)
@@ -72,9 +66,9 @@ namespace ReadSendProject
 
         private bool TryGetSheetsAndRanges()
         {
-            if (excelParams.sheetsNames.IsNullOrEmpty() == false)
+            if (excelParameters.sheetsNames.IsNullOrEmpty() == false)
             {
-                foreach (string sheetName in excelParams.sheetsNames)
+                foreach (string sheetName in excelParameters.sheetsNames)
                 {
                     try
                     {
@@ -90,9 +84,9 @@ namespace ReadSendProject
                 }
             }
 
-            if (excelParams.sheetsIndexes.IsNullOrEmpty() == false)
+            if (excelParameters.sheetsIndexes.IsNullOrEmpty() == false)
             {
-                foreach (int index in excelParams.sheetsIndexes)
+                foreach (int index in excelParameters.sheetsIndexes)
                 {
                     try
                     {
@@ -130,7 +124,7 @@ namespace ReadSendProject
             sheets.Clear();
         }
 
-        public StringMatrix Get()
+        public override StringMatrix Get()
         {
             if (TryOpenExcel())
             {
@@ -163,7 +157,7 @@ namespace ReadSendProject
             for (int sheetIndex = 0; sheetIndex < sheets.Count; sheetIndex++)
             {
                 var sheet = sheets[sheetIndex];
-                int startRowIndex = excelParams.headerRow + 1;
+                int startRowIndex = excelParameters.headerRow + 1;
                 int endRowIndex;
                 {
                     var range = ranges[sheetIndex];
@@ -177,7 +171,7 @@ namespace ReadSendProject
                 {
                     if (IsRowExpired(sheet, rowIndex))
                     {
-                        var cells = new List<string>((excelParams.columnsToEmail?.Count ?? 0) + 1)
+                        var cells = new List<string>((excelParameters.columnsToEmail?.Count ?? 0) + 1)
                         {
                             $"{sheet.Name} {rowIndex}"
                         };
@@ -193,9 +187,9 @@ namespace ReadSendProject
 
         private bool IsRowExpired(Excel._Worksheet sheet, int rowIndex)
         {
-            if (excelParams.columnsToCheckDate != null)
+            if (excelParameters.columnsToCheckDate != null)
             {
-                foreach (string columnIndex in excelParams.columnsToCheckDate)
+                foreach (string columnIndex in excelParameters.columnsToCheckDate)
                 {
                     Excel.Range cell = sheet.Cells[rowIndex, columnIndex];
 
@@ -209,7 +203,7 @@ namespace ReadSendProject
                         try
                         {
                             TimeSpan timeDifference = cellDate - DateTime.Today;
-                            if (excelParams.daysUntilExpirationCheck.Contains(timeDifference.Days))
+                            if (excelParameters.daysUntilExpirationCheck?.Contains(timeDifference.Days) ?? false)
                             {
                                 return true;
                             }
@@ -235,7 +229,7 @@ namespace ReadSendProject
             {
                 return DateTime.TryParseExact(
                     cellValue,
-                    excelParams.dateFormats.ToArray(),
+                    excelParameters.dateFormats.ToArray(),
                     null,
                     DateTimeStyles.None,
                     out date
@@ -260,10 +254,10 @@ namespace ReadSendProject
 
         private List<string> GetColumnsToEmailAtRow(Excel._Worksheet sheet, int rowIndex)
         {
-            var columns = new List<string>(excelParams.columnsToEmail?.Count ?? 0);
-            if (excelParams.columnsToEmail != null)
+            var columns = new List<string>(excelParameters.columnsToEmail?.Count ?? 0);
+            if (excelParameters.columnsToEmail != null)
             {
-                foreach (string columnIndex in excelParams.columnsToEmail)
+                foreach (string columnIndex in excelParameters.columnsToEmail)
                 {
                     try
                     {
@@ -294,11 +288,11 @@ namespace ReadSendProject
 
         private List<string> GetHeaderColumnsToEmail()
         {
-            var headerRow = new List<string>((excelParams.columnsToEmail?.Count ?? 0) + 1)
+            var headerRow = new List<string>((excelParameters.columnsToEmail?.Count ?? 0) + 1)
             {
                 "Sheet & Row"
             };
-            headerRow.AddRange(GetColumnsToEmailAtRow(sheets[0], excelParams.headerRow));
+            headerRow.AddRange(GetColumnsToEmailAtRow(sheets[0], excelParameters.headerRow));
             return headerRow;
         }
     }

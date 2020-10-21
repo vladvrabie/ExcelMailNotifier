@@ -3,7 +3,7 @@ using System;
 using System.Configuration;
 using System.Linq;
 
-namespace ReadSendProject._EmailSender
+namespace ReadSendProject.EmailSender
 {
     class AppConfigReader
     {

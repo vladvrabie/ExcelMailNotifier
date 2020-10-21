@@ -3,7 +3,7 @@ using System.Text;
 using StringMatrix = System.Collections.Generic.List<System.Collections.Generic.List<string>>;
 
 
-namespace ReadSendProject
+namespace ReadSendProject.EmailSender
 {
     class StringMatrixConverter
     {

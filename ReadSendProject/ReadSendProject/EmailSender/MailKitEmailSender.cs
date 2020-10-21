@@ -5,14 +5,14 @@ using ReadSendProject.Logging;
 using System;
 using StringMatrix = System.Collections.Generic.List<System.Collections.Generic.List<string>>;
 
-namespace ReadSendProject
+namespace ReadSendProject.EmailSender
 {
-    class EmailSender
+    class MailKitEmailSender
     {
         public ILogger logger;
         private readonly EmailSenderParameters emailParams;
 
-        public EmailSender(EmailSenderParameters parameters)
+        public MailKitEmailSender(EmailSenderParameters parameters)
         {
             emailParams = parameters;
         }
