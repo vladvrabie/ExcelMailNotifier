@@ -62,7 +62,8 @@ namespace MailingWindowsService
         private void SetupTimerToWait24H()
         {
             timer.Stop();
-            timer.Interval = 24/*h/day*/ * 60/*min/h*/ * 60/*s/min*/ * 1000/*ms/s*/;  // 1 day in ms
+            timer.Interval = 24.0/*h/day*/ * 60/*min/h*/ * 60/*s/min*/ * 1000/*ms/s*/;  // 1 day in ms
+            //timer.Interval = 1.0/*min*/ * 60/*s/min*/ * 1000/*ms/s*/;  // 1 min in ms
             timer.AutoReset = false;
             timer.Elapsed += After24HElapsed;
             timer.Start();
@@ -83,31 +84,56 @@ namespace MailingWindowsService
                 timer.Elapsed -= GetExcelData;
                 if (ShouldSendEmail())
                 {
+                    //eventLogger.LogI("Should send email true");
                     SetupTimerForSendEmail();
                 }
                 else
                 {
+                    //eventLogger.LogI("Should send email false");
                     SetupTimerToWait24H();
                 }
             }
             else
             {
+                //eventLogger.LogI("Try read excel false");
                 // SetupTimerForExcelRead();
             }
         }
 
         private bool TryReadExcel()
         {
-            var parameters = new ExcelReader.AppConfigReader() 
-            { 
-                logger = eventLogger 
+            var parameters = new ExcelReader.AppConfigReader()
+            {
+                logger = eventLogger
             }.GetExcelReaderParameters();
-            var excelReader = new ExcelReader.NPOIExcelReader(parameters) 
-            { 
-                logger = eventLogger 
+
+            //var nill = "null";
+            //eventLogger.LogI($"path: {parameters.path ?? nill}");
+            //eventLogger.LogI($"sheetsNames: {parameters.sheetsNames?.ToString() ?? nill}");
+            //eventLogger.LogI($"sheetsIndexes: {parameters.sheetsIndexes?.ToString() ?? nill}");
+            //eventLogger.LogI($"headerRow: {parameters.headerRow}");
+            //eventLogger.LogI($"columnsToCheckDate: {parameters.columnsToCheckDate?.ToString() ?? nill}");
+            //eventLogger.LogI($"columnsIndexesToCheckDate: {parameters.columnsIndexesToCheckDate?.ToString() ?? nill}");
+            //eventLogger.LogI($"dateFormats: {parameters.dateFormats?.ToString() ?? nill}");
+            //eventLogger.LogI($"daysUntilExpirationCheck: {parameters.daysUntilExpirationCheck?.ToString() ?? nill}");
+            //eventLogger.LogI($"columnsToEmail: {parameters.columnsToEmail?.ToString() ?? nill}");
+            //eventLogger.LogI($"columnsIndexesToEmail: {parameters.columnsIndexesToEmail?.ToString() ?? nill}");
+
+            var excelReader = new ExcelReader.NPOIExcelReader(parameters)
+            {
+                logger = eventLogger
             };
-            excelData = excelReader.Get();
-            return excelData != null;
+
+            try
+            {
+                excelData = excelReader.Get();
+                return excelData != null;
+            }
+            catch (Exception ex)
+            {
+                eventLogger.LogE($"Exception in ExcelReader.Get\nMessage: {ex.Message}\nSource: {ex.Source}\nStack trace: {ex.StackTrace}");
+                return false;
+            }
         }
 
         bool ShouldSendEmail()
