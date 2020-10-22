@@ -4,9 +4,11 @@ namespace MailingWindowsService.Logging
 {
     class ServiceEventLogger : EventLog, ILogger
     {
-        public void LogE(string message) => WriteEntry(message, EventLogEntryType.Error);
+        private int messageId = 0;
 
-        public void LogI(string message) => WriteEntry(message, EventLogEntryType.Information);
+        public void LogE(string message) => WriteEntry(message, EventLogEntryType.Error, ++messageId);
+
+        public void LogI(string message) => WriteEntry(message, EventLogEntryType.Information, ++messageId);
 
         void ILogger.Log(string message, MessageType type)
         {
