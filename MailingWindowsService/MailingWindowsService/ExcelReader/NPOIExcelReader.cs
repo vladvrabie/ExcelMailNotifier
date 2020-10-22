@@ -108,8 +108,24 @@ namespace MailingWindowsService.ExcelReader
             switch (cell?.CellType ?? CellType.Unknown)
             {
                 case CellType.Numeric:
-                    date = cell.DateCellValue;
-                    return true;
+                    try
+                    {
+                        date = cell.DateCellValue;
+                        return true;
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            date = DateTime.FromOADate(cell.NumericCellValue); // maybe??
+                            return true;
+                        }
+                        catch (ArgumentException)
+                        {
+                            // Nothing to do
+                        }
+                    }
+                    break;
                 case CellType.String:
                     return DateTime.TryParseExact(
                         cell.StringCellValue,
@@ -148,10 +164,7 @@ namespace MailingWindowsService.ExcelReader
             }
         }
 
-        private void CloseExcel()
-        {
-            workbook?.Close();
-        }
+        private void CloseExcel() => workbook?.Close();
 
         private void GetSheets()
         {
@@ -216,7 +229,29 @@ namespace MailingWindowsService.ExcelReader
                     switch (cell?.CellType ?? CellType.Unknown)
                     {
                         case CellType.Numeric:
-                            columns.Add(cell.DateCellValue.ToString("d", CultureInfo.CreateSpecificCulture("ro-RO")));
+                            if (excelParameters.columnsIndexesToCheckDate?.Contains(colIndex) ?? false)
+                            {
+                                try
+                                {
+                                    columns.Add(cell.DateCellValue.ToString("d", CultureInfo.CreateSpecificCulture("ro-RO")));
+                                }
+                                catch (NullReferenceException)
+                                {
+                                    try
+                                    {
+                                        var date = DateTime.FromOADate(cell.NumericCellValue);
+                                        columns.Add(date.ToString("d", CultureInfo.CreateSpecificCulture("ro-RO")));
+                                    }
+                                    catch (ArgumentException)
+                                    {
+                                        columns.Add(cell.NumericCellValue.ToString());
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                columns.Add(cell.NumericCellValue.ToString());
+                            }
                             break;
                         case CellType.String:
                             columns.Add(cell.StringCellValue);
